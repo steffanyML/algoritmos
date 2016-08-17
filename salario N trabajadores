@@ -1,0 +1,33 @@
+#include "stdafx.h"
+#include <iostream>
+#include"conio.h"
+
+using namespace std;
+
+void main()
+{
+	
+	float n,salario,s,iva,afp;
+	iva=0.121;
+	afp=0.13;
+	cout<<"ingrese valor el numero de trabajadores "<<endl;
+	cin>>n;
+	
+	for (int i=0; i<n; i++)
+	{ 
+		cout<<"ingrese el salario"<<endl;
+	    cin>>salario;
+	     if(salario>3600)
+		 {
+		 s=salario*(1-afp-iva);
+
+		 }
+		 else  
+		 {
+			 s=salario*(1-afp);
+		 }
+	}
+	
+	cout<<"salario es:"<<s<<endl;
+	getch();
+}
