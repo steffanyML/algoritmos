@@ -1,0 +1,40 @@
+
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+
+using namespace std;
+
+void main ()
+
+{
+	float r,l,t,p,c;
+	int opcion;
+	cout<<"introduzca lado del cuadrado"<<endl;
+	cin>>l;
+	cout<<"introduzca la tasa"<<endl;
+	cin>>t;
+	cout<<"introduzca el periodo en años"<<endl;
+	cin>>p;
+	cout<<"introduzca capital"<<endl;
+	cin>>c;
+	 do
+	 {
+	cout<<"1.- area del cuadrado"<<endl;
+	cout<<"2.- interes simple"<<endl;
+	cout<<"0.-salir"<<endl;
+	cout<<"introduzca una opcion"<<endl;
+	cin>>opcion;
+	  switch (opcion)
+	  {
+	     case 1: r=l*l;break;
+		 case 2: r= c*p*c;break;
+		 case 0:cout<<"salir";break;
+		 default: cout<<"opcion invalida";
+	  }
+	 cout<<"su resultado es"<<r<<endl;
+	  }while (opcion!=0);
+	 
+	 getch ();
+
+}
