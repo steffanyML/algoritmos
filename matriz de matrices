@@ -1,0 +1,137 @@
+// ejemplomatriz.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#define MAX 10
+using namespace std;
+
+struct matriz{
+	float numero[MAX][MAX];
+};
+
+void cargar(int p, int q,int m,int n, matriz pip[MAX][MAX]);
+void mostrar(int p, int q,int m,int n, matriz pip[MAX][MAX]);
+
+float prom (int p, int q, float mat [MAX][MAX]);
+float mayor (int p, int q, float mat[MAX][MAX], float &menor);
+float comparar(int p, int q,int m,int n, matriz pip[MAX][MAX],float mayort,float menort);
+
+
+void main()
+{
+	matriz pip2 [MAX][MAX];
+	float promedio, may,promfila,promgeneral=0,men;
+	int p, q, n, m;
+    do{
+	   cout<<"ingrese el valor de p";
+	   cin>> p;
+    }while ((p>MAX)||(p<=0));
+	do {
+		cout<<"ingrese el valor de q";
+		cin>>q;
+	} while ((q>MAX)||(q<=0));
+
+		do {
+		cout<<"ingrese el tamaño de las filas de la matriz mayor:";
+		cin>>m;
+	} while ((m>MAX)||(m<=0));
+		do {
+        cout<<"ingrese el tamaño de las columnas de la matriz:";
+		cin>>n;
+		} while ((n>MAX)||(n<=0));
+
+	cargar(p,q,m,n,pip2);
+	promgeneral=0;
+	for(int i=0;i<m;i++)
+	   {promfila=0;
+		for(int j=0;j<n;j++)
+           { promedio=prom(p,q,pip2[i][j].numero);
+	         may=mayor(p,q,pip2[i][j].numero,men);
+			 cout<<"el promedio es :";
+			 cout<<promedio<<endl;
+			 cout<<"el mayor elemento es :";
+			 cout<<may<<endl;
+			 promfila=promfila+promedio;
+			 promgeneral= promgeneral+promedio;
+			 cout<<"el menor elemento es:"<<men<<endl;
+		}
+		promfila=promfila/n;
+		cout<<"el promedio de cada fila es:"<<promfila<<endl;
+	    }
+	promgeneral=promgeneral/(m*n);
+	cout<<"el promedio general es:"<<promgeneral<<endl;
+	mostrar(p,q,m,n,pip2);
+
+	getch ();
+}
+
+
+void cargar(int p, int q, int m, int n, matriz pip[MAX][MAX])
+{
+	for(int i=0;i<m;i++)
+		for(int j=0;j<n;j++)
+			for(int k=0;k<p;k++)
+				for(int f=0;f<q;f++)
+				{
+					do{
+					  cout<<"pip ["<<i<<"]["<<j<<"].numero["<<k<<"]["<<f<<"]= ";
+					   cin>> pip[i][j].numero[k][f];
+					} while ((pip[i][j].numero[k][f]<0)||(pip[i][j].numero[k][f]>100));
+				}
+}
+
+void mostrar (int p, int q, int m, int n, matriz pip[MAX][MAX])
+ {
+	 for(int i=0;i<m;i++)
+	    for(int j=0;j<n;j++)
+		   for(int k=0;k<p;k++)
+			  for(int f=0;f<q;f++)
+				{
+					cout<<"pip ["<<i<<"]["<<j<<"].numero["<<k<<"]["<<f<<"]= ";
+					cout<<pip[i][j].numero[k][f]<< endl;
+			  }
+ }
+ float prom (int p, int q, float mat [MAX][MAX])
+ {
+	 float pr,acum=0;
+	 for(int k=0;k<p;k++)
+		for(int f=0;f<q;f++)
+		    acum=acum+mat[k][f];
+	 pr=acum/(p*q);
+	 return pr;
+ }
+
+float mayor (int p, int q, float mat[MAX][MAX], float &menor)
+{
+	float m=mat[0][0]; 
+	menor=m;
+	for(int k=0;k<p;k++)
+		for(int f=0;f<q;f++)
+			{if (m<mat[k][f])
+				m=mat[k][f];
+	         if(menor>mat[k][f])
+				 menor=mat[k][f];
+		}
+	return(m);
+}
+	
+
+float comparar(int p, int q,int m,int n, matriz pip[MAX][MAX],float mayort,float menort)
+{
+	mayort=pip[0][0].numero[0][0];
+	menort=mayort;
+	for(int i=0;i<m;i++)
+	    for(int j=0;j<n;j++)
+		   for(int k=0;k<p;k++)
+			  for(int f=0;f<q;f++)
+			  {if(mayort<pip[i][j].numero[k][f])
+			     mayort=pip[i][j].numero[k][f];
+	             if(menort<pip[i][j].numero[k][f])
+					  menort=pip[i][j].numero[k][f];
+
+			  }
+
+
+} 
