@@ -1,0 +1,65 @@
+#include "stdafx.h"
+#include "conio.h"
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+
+void main()
+{
+	int op,op2,op3;
+	cout<<"USUARIO"<<endl;
+	cout<<"jhamil cuba"<<endl;
+	cout<<"STAZ encuentra tu PASANTIA"<<endl;
+	cout<<"============================"<<endl;
+	do{
+	cout<<"elegir profesion"<<endl;
+	  cout<<"1.- ing. petrolera"<<endl;
+	  cout<<"2.-ing industrial"<<endl;
+	  cout<<"3.-ing. de sistemas"<<endl;
+	  cout<<"4.-ing. civil"<<endl;
+	  cout<<"5.-ing comercial"<<endl;
+	  cout<<"6.-administracion de empresas"<<endl;
+	  cout<<"0.-siguiente"<<endl;
+	  cout<<"opcion deseada"<<endl;
+	  cin>>op;
+	}while (op!=0);
+	system("cls");
+
+	do{
+	cout<<"elija departamento"<<endl; 
+	cout<<"1.-beni"<<endl;
+	cout<<"2.-cochabamba"<<endl;
+	cout<<"3.-La Paz"<<endl;
+	cout<<"4.-oruro"<<endl;
+	cout<<"5.-pando"<<endl;
+	cout<<"6.-potosi"<<endl;
+	cout<<"7.-santa cruz"<<endl;
+	cout<<"8.-sucre"<<endl;
+	cout<<"9.-tarija"<<endl;
+		  cout<<"0.-siguiente"<<endl;
+	cout<<"opcion deseada"<<endl;
+	  cin>>op2;
+	
+	}while (op2!=0);
+	system("cls");
+
+	do{
+	cout<<"elija empresa deseada"<<endl;
+	cout<<"1.-schlumberger"<<endl;
+	cout<<"2.-total"<<endl;
+	cout<<"3.-carlos caballero"<<endl;
+	cout<<"4.-bolinter"<<endl;
+	cout<<"5.-halliburton"<<endl;
+	cout<<"6.-YPFB"<<endl;
+		  cout<<"0.-encontrar"<<endl;
+	cout<<"opcion deseada"<<endl;
+	  cin>>op3;
+	}while (op3!=0);
+	
+	system("cls");
+
+	getch ;
+
+
+}
+
