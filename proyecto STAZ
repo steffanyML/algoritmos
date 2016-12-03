@@ -1,0 +1,1592 @@
+#include "stdafx.h"
+#include <iostream>
+#include <conio.h>
+#include "stdio.h"
+using namespace std;
+
+
+struct Usuario
+{
+	int id_usuario;
+	char Nombre[40];
+	char Telefono[11];
+	char Email[50];
+	bool eliminado;
+};
+
+
+void MostrarUsuario(Usuario reg);
+bool PedirDatosUsuario(char Nombre[40],char Telefono[11],char Email[50]);
+void CamposAUsuario(Usuario &reg,int id_usuario,char Nombre[40],char Telefono[11],char Email[50],bool eliminado);
+void UsuarioACampos(Usuario reg,int &id_usuario,char Nombre[40],char Telefono[11],char Email[50],bool &eliminado);
+void AdicionarUsuario(int id_usuario,char Nombre[40],char Telefono[11],char Email[50]);
+void ModificarUsuario(int id_usuario,char Nombre[40],char Telefono[11],char Email[50]);
+bool BuscarUsuario(int id_usuario,char Nombre[40],char Telefono[11],char Email[50]);
+void EliminarUsuario(int id_usuario);
+void ListarUsuario();
+void MenuUsuario();
+
+
+struct Area
+{
+	int id_area;
+	char Nombre[40];
+	int id_region;
+	bool eliminado;
+};
+
+
+void MostrarArea(Area reg);
+bool PedirDatosArea(int &id_area, char Nombre[40]);
+void CamposAArea(Area &reg,int id_area,char Nombre[40],int id_region,bool eliminado);
+void AreaACampos(Area reg,int id_area,char Nombre[40],int &id_region,bool &eliminado);
+void AdicionarArea(int id_area,char Nombre[40],int id_region);
+void ModificarArea(int id_area,char Nombre[40],int id_region);
+bool BuscarArea(int id_area,char Nombre[40],int &id_region);
+void EliminarArea(int id_area);
+void ListarArea();
+void MenuArea();
+
+
+struct Region
+{
+	int id_region;
+	char Nombre[20];
+    bool eliminado;
+};
+
+
+void MostrarRegion(Region reg);
+bool PedirDatosRegion(char Nombre[20]);
+void CamposARegion(Region &reg,int id_region,char Nombre[20],bool eliminado);
+void RegionACampos(Region reg,int &id_region,char Nombre[20],bool &eliminado);
+void AdicionarRegion(int id_region,char Nombre[20]);
+void ModificarRegion(int id_region,char Nombre[20]);
+bool BuscarRegion(int id_region,char Nombre[20]);
+void EliminarRegion(int id_region);
+void ListarRegion();
+void MenuRegion();
+
+struct Empresa
+{
+	int id_empresa;
+    char Nombre[40];
+	char NIT[15];
+	int id_region;
+	int id_area;
+	bool eliminado;
+};
+bool BuscarRegionEnEmpresa(int id_region)
+{
+	bool esta = false,eliminado = false;
+	Empresa reg;
+	FILE *ptr;
+
+	ptr = fopen("Empresa.dat","rb");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_region == reg.id_region && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+
+			cout<<"El codigo region esta siendo usado en bomba"<<endl;
+		}
+
+		fclose(ptr);
+	}
+	return esta;
+}
+
+
+bool BuscarAreaEnEmpresa(int id_area)
+{
+	bool esta = false,eliminado = false;
+	Empresa reg;
+	FILE *ptr;
+
+	ptr = fopen("Empresa.dat","rb");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_area==reg.id_area  && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			cout<<"El codigo de area esta siendo usado "<<endl;
+		}
+
+		fclose(ptr);
+	}
+	return esta;
+}
+
+
+bool ValidarNombre(char *nombre)
+{
+	int n=strlen(nombre);
+	bool cumple= true;
+	for(int i=0;i<n;i++)
+	{
+		if(!( 
+			(nombre[i] >= 'a' && nombre[i] <='z') ||
+			(nombre[i] >= 'A' && nombre[i] <='Z') ||
+			(nombre[i] == ' ')))
+		{
+			cumple = false;
+		}
+	}
+	if(!cumple)
+	{
+		cout<<"Nombre contiene simbolos"<<endl<<"Ingresar de nuevo"<<endl;
+	}
+	return cumple;
+}
+
+void MostrarEmpresa(Empresa reg);
+bool PedirDatosEmpresa(int &id_region,int &id_area, char Nombre[40],char NIT[15]);
+void CamposAEmpresa(Empresa &reg,int id_empresa,char Nombre[40],char NIT[15],int id_region,int id_area,bool eliminado);
+void EmpresaACampos(Empresa reg,int &id_empresa,char Nombre[40],char NIT[15],int &id_region,int &id_area,bool &eliminado);
+void AdicionarEmpresa(int id_empresa,char Nombre[40],char NIT[15],int id_region,int id_area);
+void ModificarEmpresa(int id_empresa,char Nombre[40],char NIT[15],int id_region,int id_area);
+bool BuscarEmpresa(int id_empresa,char Nombre[40],char NIT[15],int &id_region,int &id_area);
+void EliminarEmpresa(int id_empresa);
+void ListarEmpresa();
+void MenuEmpresa();
+
+
+void MostrarUsuario(Usuario reg)
+{
+	cout<<reg.id_usuario<<"             ";
+	cout<<reg.Nombre<<"	 ";
+	cout<<reg.Telefono<<"   ";
+	cout<<reg.Email<<"	      ";
+	cout<<endl;
+}
+int ValidarEmail(char *email)
+{int b(strlen(email));
+ bool cumple=true;
+ for(int i=0; i<b; i++)
+ {if(!(email[i]=='@')||(email[i]=='.')||(email[i]=='_'))
+  cumple=false;
+ }
+ if(cumple==false)
+ {cout<<"No tiene las caracteristicas de un email"<<endl<<"Vuelva a ingresar";
+ }
+ return cumple;
+}
+bool PedirDatosUsuario(char Nombre[40],char Telefono[11],char Email[50])
+{
+	char aux[100];
+	do
+	{
+		cout<<"Nombre:";
+		gets(Nombre);
+	}while(!ValidarNombre(Nombre));
+
+	cout<<"Telefono:";
+	gets(Telefono);
+    cout<<"Email:";
+	gets(Email);
+	
+
+	return true;
+}
+void CamposAUsuario(Usuario &reg,int id_usuario,char Nombre[20],char Telefono[11],char Email[50],bool eliminado)
+{
+	reg.id_usuario = id_usuario;
+	strcpy_s(reg.Nombre, Nombre);
+	strcpy_s(reg.Telefono, Telefono);
+	strcpy_s(reg.Email, Email);
+	reg.eliminado = eliminado;
+}
+
+
+void UsuarioACampos(Usuario reg,int &id_usuario,char Nombre[20],char Telefono[11],char Email[50],bool &eliminado)
+{
+	id_usuario = reg.id_usuario;
+	strcpy(Nombre, reg.Nombre);
+	strcpy(Telefono, reg.Telefono);
+	strcpy(Email, reg.Email);
+	eliminado = reg.eliminado;
+}
+
+
+void AdicionarUsuario(int id_usuario,char Nombre[40],char Telefono[11],char Email[50])
+{
+	Usuario reg;
+	FILE *ptr;
+
+	ptr = fopen("Usuario.dat","ab");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		bool eliminado = false;
+		CamposAUsuario(reg,id_usuario,Nombre,Telefono,Email,eliminado);
+
+		fwrite(&reg,sizeof(reg),1,ptr);
+		fclose(ptr);
+	}
+}
+void ModificarUsuario(int id_usuario,char Nombre[40],char Telefono[11],char Email[50])
+{
+	bool esta = false,eliminado = false;
+	Usuario reg;
+	FILE *ptr;
+
+	ptr = fopen("Usuario.dat","rb+");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_usuario == reg.id_usuario && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			fseek(ptr,sizeof(reg)*(-1),SEEK_CUR);
+
+			CamposAUsuario(reg,id_usuario,Nombre,Telefono,Email,eliminado);
+
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+}
+bool BuscarUsuario(int id_usuario,char Nombre[20],char Telefono[11],char Email[50])
+{
+	bool esta = false,eliminado = false;
+	Usuario reg;
+	FILE *ptr;
+
+	ptr = fopen("Usuario.dat","rb");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_usuario == reg.id_usuario && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			UsuarioACampos(reg,id_usuario,Nombre,Telefono,Email,eliminado);
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+	return esta;
+}
+void EliminarUsuario(int id_usuario)
+{
+	bool esta = false,eliminado = false;
+	Usuario reg;
+	FILE *ptr;
+
+	ptr = fopen("Usuario.dat","rb+");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_usuario == reg.id_usuario && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			
+				fseek(ptr,sizeof(reg)*(-1),SEEK_CUR);
+
+				reg.eliminado=true;
+
+				fwrite(&reg,sizeof(reg),1,ptr);
+			
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+}
+void ListarUsuario()
+{
+	Usuario reg;
+	FILE *ptr;
+
+	ptr = fopen("Usuario.dat","rb");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		cout<<"                     **Listado de Usuario**                "<<endl;
+		cout<<"============================================================="<<endl;
+		cout<<"|id_usuario  -  Nombre      -   Telefono    -   Email       |"<<endl;
+		cout<<"============================================================="<<endl;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			if(!reg.eliminado)
+			{
+				MostrarUsuario(reg);
+			}
+
+			fread(&reg,sizeof(reg),1,ptr);
+
+		}
+
+		fclose(ptr);
+	}
+}
+void MenuUsuario()
+{
+	int id_usuario;
+	char Nombre[20];
+	char Telefono[11];
+	char Email[50];
+	Usuario reg;
+	bool eliminado = false;
+	int op = 0;
+	char aux[100];
+	do
+	{
+		cout<<endl<<"========================";
+		cout<<endl<<"      **Usuario**      ";
+		cout<<endl<<"========================";
+		cout<<endl<<"    |MENU DE OPCIONES|  ";
+		cout<<endl<<"1. Adicionar";
+		cout<<endl<<"2. Listar";
+		cout<<endl<<"3. Buscar";
+		cout<<endl<<"4. Eliminar";
+		cout<<endl<<"5. Modificar";
+		cout<<endl<<"6. Salir";
+		cout<<endl<< "Seleccione opcion: ";
+		cin>>op;
+		//cin.ignore();
+		gets_s(aux);
+		system("cls");
+		switch(op)
+		{
+		case 1:
+			{
+				do
+				{
+					id_usuario = -1;
+					cout<<"Ingresar id_usuario (escriba 0 para salir):";
+					cin>>id_usuario;
+					if((id_usuario != 0) && (BuscarUsuario(id_usuario, Nombre, Telefono, Email)))
+					{
+						id_usuario = -1;
+						cout<<"Error, ya existe el id ingresado"<<endl;
+					}
+					gets_s(aux);
+					cin.clear();
+				}while(id_usuario == -1);
+				if((id_usuario!= 0)&& PedirDatosUsuario(Nombre,Telefono,Email))
+				{
+					AdicionarUsuario(id_usuario,Nombre,Telefono,Email);
+				}
+				break;
+			}
+		case 2:
+			{
+				ListarUsuario();
+				break;
+			}
+		case 3:
+			{
+				do
+				{
+					id_usuario = -1;
+					cout<<"Ingresar id_usuario:";
+					cin>>id_usuario;
+					gets_s(aux);
+					cin.clear();
+				}while(id_usuario == -1 );
+				if(BuscarUsuario(id_usuario,Nombre,Telefono,Email))
+				{
+					CamposAUsuario(reg,id_usuario,Nombre,Telefono,Email,eliminado);
+
+					MostrarUsuario(reg);
+				}
+				break;
+			}
+		case 4:
+			{
+				do
+				{
+					id_usuario = -1;
+					cout<<"Ingresar id_usuario:";
+					cin>>id_usuario;
+					gets_s(aux);
+					cin.clear();
+				}while(id_usuario == -1 );
+				EliminarUsuario(id_usuario);
+				break;
+			}
+		case 5:
+			{
+				do
+				{
+					id_usuario = -1;
+					cout<<"Ingresar id_usuario (escriba 0 para salir):";
+					cin>>id_usuario;
+					gets_s(aux);
+					cin.clear();
+				}while(id_usuario == -1 || (id_usuario != 0 && !BuscarUsuario(id_usuario, Nombre, Telefono, Email)));
+				if((id_usuario!= 0)&& PedirDatosUsuario(Nombre,Telefono,Email))
+				{
+					ModificarUsuario(id_usuario,Nombre,Telefono,Email);
+				}
+				break;
+			}
+		}
+	}while(op != 6);
+}
+
+void MostrarArea(Area reg)
+{
+	cout<<reg.id_area<<  " 	           ";
+	cout<<reg.id_region<<"	    ";
+	cout<<reg.Nombre<<"        ";
+	cout<<endl;
+}
+
+bool PedirDatosArea(int &id_region, char Nombre[40])
+{
+	char aux[100];
+	char a[30];
+	do
+	{
+		id_region = -1;
+		cout<<"Ingresar id_region (escriba 0 para salir):";
+		cin>>id_region;
+		gets_s(aux);
+		cin.clear();
+	}while(id_region == -1 || (id_region != 0 && !BuscarRegion(id_region,a)));
+	if(id_region == 0) 
+		return false;
+	do
+	   {cout<<"Nombre:";
+		gets(Nombre);
+	   }while(!ValidarNombre(Nombre));
+	
+   return true;
+}
+
+void CamposAArea(Area &reg,int id_area, char Nombre[40], int id_region,bool eliminado)
+{
+	reg.id_area = id_area;
+	reg.id_region = id_region;
+	strcpy(reg.Nombre,Nombre);
+	reg.eliminado = eliminado;
+}
+
+
+void AreaACampos(Area reg,int id_area, char Nombre[40], int &id_region,bool &eliminado)
+{
+	id_area = reg.id_area;
+	strcpy(Nombre , reg.Nombre);
+	id_region = reg.id_region;
+	eliminado = reg.eliminado;
+}
+
+void AdicionarArea(int id_area, char Nombre[40], int id_region)
+{
+	Area reg;
+	FILE *ptr;
+
+	ptr = fopen("Area.dat","ab");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		bool eliminado = false;
+		CamposAArea(reg,id_area,Nombre,id_region,eliminado);
+
+		fwrite(&reg,sizeof(reg),1,ptr);
+		fclose(ptr);
+	}
+}
+
+void ModificarArea(int id_area, char Nombre[40], int id_region)
+{
+	bool esta = false,eliminado = false;
+	Area reg;
+	FILE *ptr;
+
+	ptr = fopen("Area.dat","rb+");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_area == reg.id_area && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			fseek(ptr,sizeof(reg)*(-1),SEEK_CUR);
+
+			CamposAArea(reg,id_area,Nombre,id_region,eliminado);
+
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+}
+
+bool BuscarArea(int id_area, char Nombre[40], int &id_region)
+{
+	bool esta = false,eliminado = false;
+	Area reg;
+	FILE *ptr;
+
+	ptr = fopen("Area.dat","rb");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_area == reg.id_area && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			AreaACampos(reg,id_area,Nombre,id_region,eliminado);
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+	return esta;
+}
+
+void EliminarArea(int id_area)
+{
+	bool esta = false,eliminado = false;
+	Area reg;
+	FILE *ptr;
+
+	ptr = fopen("Area.dat","rb+");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_area == reg.id_area && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+		
+			
+				fseek(ptr,sizeof(reg)*(-1),SEEK_CUR);
+
+				reg.eliminado=true;
+
+				fwrite(&reg,sizeof(reg),1,ptr);
+			
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+}
+
+void ListarArea()
+{
+	Area reg;
+	FILE *ptr;
+
+	ptr = fopen("Area.dat","rb");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		cout<<"              **Listado de Area**            "<<endl;
+		cout<<"============================================="<<endl;
+		cout<<" |id_area  -      id_region         - Nombre|"<<endl;
+		cout<<"============================================="<<endl;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			if(!reg.eliminado)
+			{
+				MostrarArea(reg);
+			}
+
+			fread(&reg,sizeof(reg),1,ptr);
+
+		}
+
+		fclose(ptr);
+	}
+}
+
+void MenuArea()
+{
+	int id_area;
+	char Nombre[40];
+	int id_region;
+	Area reg;
+	bool eliminado = false;
+	int op = 0;
+	char aux[100];
+	do
+	{   cout<<endl<<"========================";
+		cout<<endl<<"        **Area**    ";
+		cout<<endl<<"========================";
+		cout<<endl<<"    |MENU DE OPCIONES|  ";
+		cout<<endl<<"1. Adicionar";
+		cout<<endl<<"2. Listar";
+		cout<<endl<<"3. Buscar";
+		cout<<endl<<"4. Eliminar";
+		cout<<endl<<"5. Modificar";
+		cout<<endl<<"6. Salir";
+		cout<<endl<< "Seleccione opcion: ";
+		cin>>op;
+		//cin.ignore();
+		gets(aux);
+		system("cls");
+		switch(op)
+		{
+		case 1:
+			{
+				do
+				{
+					id_area = -1;
+					cout<<"Ingresar id_area (escriba 0 para salir):";
+					cin>>id_area;
+					if(id_area !=0 && BuscarArea(id_area, Nombre, id_region))
+					{
+						id_area = -1;
+						cout<<"Error, ya existe el id ingresado"<<endl;
+					}
+					gets(aux);
+					cin.clear();
+				}while(id_area == -1);
+				if(id_area!=0 && PedirDatosArea(id_region, Nombre))
+				{
+					AdicionarArea(id_area, Nombre, id_region);
+				}
+				break;
+			}
+		case 2:
+			{
+				ListarArea();
+				break;
+			}
+		case 3:
+			{
+				do
+				{
+					id_area = -1;
+					cout<<"Ingresar id_area:";
+					cin>>id_area;
+					gets(aux);
+					cin.clear();
+				}while(id_area == -1);
+				if(BuscarArea(id_area,Nombre,id_region))
+				{
+					CamposAArea(reg,id_area,Nombre,id_region,eliminado);
+
+					MostrarArea(reg);
+				}
+				break;
+			}
+		case 4:
+			{
+				do
+				{
+					id_area = -1;
+					cout<<"Ingresar id_area :";
+					cin>>id_area;
+					gets(aux);
+					cin.clear();
+				}while(id_area == -1);
+				EliminarArea(id_area);
+				break;
+			}
+		case 5:
+			{
+				do
+				{
+					id_area = -1;
+					cout<<"Ingresar id_area (escriba 0 para salir):";
+					cin>>id_area;
+					gets(aux);
+					cin.clear();
+				}while((id_area == -1 )|| ((id_area!=0 && !BuscarArea(id_area, Nombre, id_region))));
+				if((id_area!=0)&& PedirDatosArea(id_region,Nombre))
+				{
+					ModificarArea(id_area,Nombre,id_region);
+				}
+				break;
+			}
+		}
+	}while(op != 6);
+}
+
+void MostrarRegion(Region reg)
+{
+	cout<<reg.id_region<<"	      ";
+	cout<<reg.Nombre<<"	   ";
+	cout<<endl;
+}
+
+bool PedirDatosRegion(char Nombre[20])
+{
+	char aux[100];
+	do
+	{
+		cout<<"Nombre:";
+		gets(Nombre);
+	}while(!ValidarNombre(Nombre));
+ 
+ return true;
+}
+
+void CamposARegion(Region &reg,int id_region,char Nombre[20],bool eliminado)
+{
+	reg.id_region = id_region;
+	strcpy_s(reg.Nombre, Nombre);
+	reg.eliminado = eliminado;
+}
+
+
+void RegionACampos(Region reg,int &id_region,char Nombre[20],bool &eliminado)
+{
+	id_region = reg.id_region;
+	strcpy(Nombre, reg.Nombre);
+	eliminado = reg.eliminado;
+}
+
+void AdicionarRegion(int id_region,char Nombre[20])
+{
+	Region reg;
+	FILE *ptr;
+
+	ptr = fopen("Region.dat","ab");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		bool eliminado = false;
+		CamposARegion(reg,id_region,Nombre,eliminado);
+
+		fwrite(&reg,sizeof(reg),1,ptr);
+		fclose(ptr);
+	}
+}
+void ModificarRegion(int id_region,char Nombre[20])
+{
+	bool esta = false,eliminado = false;
+	Region reg;
+	FILE *ptr;
+
+	ptr = fopen("Region.dat","rb+");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_region == reg.id_region && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			fseek(ptr,sizeof(reg)*(-1),SEEK_CUR);
+
+			CamposARegion(reg,id_region,Nombre,eliminado);
+
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+}
+bool BuscarRegion(int id_region,char Nombre[20])
+{
+	bool esta = false,eliminado = false;
+	Region reg;
+	FILE *ptr;
+
+	ptr = fopen("Region.dat","rb");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_region == reg.id_region && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			RegionACampos(reg,id_region,Nombre,eliminado);
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+	return esta;
+}
+void EliminarRegion(int id_region)
+{
+	bool esta = false,eliminado = false;
+	Region reg;
+	FILE *ptr;
+
+	ptr = fopen("Region.dat","rb+");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_region == reg.id_region && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			if(!BuscarRegionEnEmpresa(reg.id_region))
+			
+				{fseek(ptr,sizeof(reg)*(-1),SEEK_CUR);
+
+				 reg.eliminado=true;
+
+				 fwrite(&reg,sizeof(reg),1,ptr);
+			    }
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+}
+void ListarRegion()
+{
+	Region reg;
+	FILE *ptr;
+
+	ptr = fopen("Region.dat","rb");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		cout<<"                 **Listado de Regiones**         "<<endl;
+		cout<<"-------------------------------------------------"<<endl;
+		cout<<"Departamentos en los que puede realizar la pasantia"<<endl;
+		cout<<"================================================="<<endl;
+		cout<<"|id_region  - Nombre                             |"<<endl;
+		cout<<"================================================="<<endl;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			if(!reg.eliminado)
+			{
+				MostrarRegion(reg);
+			}
+
+			fread(&reg,sizeof(reg),1,ptr);
+
+		}
+
+		fclose(ptr);
+	}
+}
+void MenuRegion()
+{
+	int id_region;
+	char Nombre[20];
+	Region reg;
+	bool eliminado = false;
+	int op = 0;
+	char aux[100];
+	do
+	{
+	    cout<<endl<<"========================";
+		cout<<endl<<"        **Region**       ";
+		cout<<endl<<"========================";
+		cout<<endl<<"    |MENU DE OPCIONES|  ";
+		cout<<endl<<"1. Adicionar";
+		cout<<endl<<"2. Listar";
+		cout<<endl<<"3. Buscar";
+		cout<<endl<<"4. Eliminar";
+		cout<<endl<<"5. Modificar";
+		cout<<endl<<"6. Salir";
+		cout<<endl<< "Seleccione opcion: ";
+		cin>>op;
+		//cin.ignore();
+		gets(aux);
+		system("cls");
+		switch(op)
+		{
+		case 1:
+			{
+				do
+				{
+					id_region = -1;
+					cout<<"Ingresar id_region (escriba 0 para salir):";
+					cin>>id_region;
+					if(id_region != 0 && BuscarRegion(id_region, Nombre))
+					{
+						id_region = -1;
+						cout<<"Error, ya existe el id ingresado"<<endl;
+					}
+					gets(aux);
+					cin.clear();
+				}while(id_region == -1);
+				if((id_region!= 0)&&PedirDatosRegion(Nombre))
+				{
+					AdicionarRegion(id_region,Nombre);
+				}
+				break;
+			}
+		case 2:
+			{
+				ListarRegion();
+				break;
+			}
+		case 3:
+			{
+				do
+				{
+					id_region = -1;
+					cout<<"Ingresar id_region:";
+					cin>>id_region;
+					gets(aux);
+					cin.clear();
+				}while(id_region == -1 );
+				if(BuscarRegion(id_region,Nombre))
+				{
+					CamposARegion(reg,id_region,Nombre,eliminado);
+
+					MostrarRegion(reg);
+				}
+				break;
+			}
+		case 4:
+			{
+				do
+				{
+					id_region = -1;
+					cout<<"Ingresar id_region:";
+					cin>>id_region;
+					gets(aux);
+					cin.clear();
+				}while(id_region == -1 );
+				EliminarRegion(id_region);
+				break;
+			}
+		case 5:
+			{
+				do
+				{
+					id_region = -1;
+					cout<<"Ingresar id_region (escriba 0 para salir):";
+					cin>>id_region;
+					gets(aux);
+					cin.clear();
+				}while(id_region == -1 || (id_region != 0 && !BuscarRegion(id_region, Nombre)));
+				if((id_region!= 0)&& PedirDatosRegion(Nombre))
+				{
+					ModificarRegion(id_region,Nombre);
+				}
+				break;
+			}
+		}
+	}while(op != 6);
+}
+
+void MostrarEmpresa(Empresa reg)
+{
+	cout<<reg.id_empresa<<"	       ";
+    cout<<reg.Nombre<<"            ";
+	cout<<reg.NIT<<"          ";
+	cout<<reg.id_region<<"	     ";
+	cout<<reg.id_area<<"	    ";
+	cout<<endl;
+}
+
+bool PedirDatosEmpresa( int &id_region, int &id_area,char Nombre[40], char NIT[15])
+{
+   char aux[100];
+   char a[20];
+	
+    
+	do
+	{
+		id_region = -1;
+		cout<<"Ingresar id_region (escriba 0 para salir):";
+		cin>>id_region;
+		gets(aux);
+		cin.clear();
+	}while(id_region == -1 || (id_region != 0 && !BuscarRegion(id_region,a)));
+	if(id_region == 0) return false;
+
+	
+	do
+	{
+		id_area=-1;
+		cout<<"Ingresar id_area (escriba 0 para salir):";
+		cin>> id_area;
+		gets(aux);
+		cin.clear();
+	}while(id_area == -1 || (id_area != 0 && !BuscarArea(id_area,a,id_region)));
+	   if(id_area == 0) return false;
+        do
+	   {cout<<"Nombre:";
+		gets(Nombre);
+	   }while(!ValidarNombre(Nombre));
+
+	   cout<<"NIT:";
+	   gets(NIT);
+
+	return true;
+}
+void CamposAEmpresa(Empresa &reg,int id_empresa,char Nombre[40], char NIT[15],int id_region, int id_area,bool eliminado)
+{
+	reg.id_empresa = id_empresa;
+    strcpy(reg.Nombre, Nombre);
+	strcpy(reg.NIT, NIT);
+	reg.id_region = id_region;
+	reg.id_area = id_area;
+	reg.eliminado = eliminado;
+}
+
+void EmpresaACampos(Empresa reg, int &id_empresa, char Nombre[40], char NIT[15], int &id_region, int &id_area, bool &eliminado)
+{
+	id_empresa = reg.id_empresa;
+   strcpy(Nombre, reg.Nombre);
+	strcpy(NIT, reg.NIT);
+	id_region = reg.id_region;
+	id_area = reg.id_area;
+	eliminado = reg.eliminado;
+}
+
+void AdicionarEmpresa(int id_empresa, char Nombre[40], char NIT[15], int id_region, int id_area)
+{
+	Empresa reg;
+	FILE *ptr;
+
+	ptr = fopen("Empresa.dat","ab");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		bool eliminado = false;
+		CamposAEmpresa(reg,id_empresa,Nombre,NIT,id_region,id_area,eliminado);
+
+		fwrite(&reg,sizeof(reg),1,ptr);
+		fclose(ptr);
+	}
+}
+
+void ModificarEmpresa(int id_empresa, char Nombre[40], char NIT[15], int id_region, int id_area)
+{
+	bool esta = false,eliminado = false;
+	Empresa reg; 
+	FILE *ptr;
+
+	ptr = fopen("Empresa.dat","rb+");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_empresa == reg.id_empresa && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			fseek(ptr,sizeof(reg)*(-1),SEEK_CUR);
+
+			CamposAEmpresa(reg,id_empresa,Nombre,NIT,id_region,id_area,eliminado);
+
+			fwrite(&reg,sizeof(reg),1,ptr);
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+}
+
+bool BuscarEmpresa(int id_empresa, char Nombre[40], char NIT[15], int &id_region, int &id_area)
+{
+	bool esta = false,eliminado = false;
+	Empresa reg;
+	FILE *ptr;
+
+	ptr = fopen("Empresa.dat","rb");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_empresa == reg.id_empresa && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			EmpresaACampos(reg,id_empresa,Nombre,NIT,id_region,id_area,eliminado);
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+	return esta;
+}
+
+void EliminarEmpresa(int id_empresa)
+{
+	bool esta = false,eliminado = false;
+	Empresa reg;
+	FILE *ptr;
+
+	ptr = fopen("Empresa.dat","rb+");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		esta = false;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr) && !esta)
+		{
+			if(id_empresa == reg.id_empresa && !reg.eliminado)
+			{
+				esta = true;
+			}
+			else
+			{
+				fread(&reg,sizeof(reg),1,ptr);
+			}
+		}
+		if(esta)
+		{
+			
+			
+				fseek(ptr,sizeof(reg)*(-1),SEEK_CUR);
+
+				reg.eliminado=true;
+
+				fwrite(&reg,sizeof(reg),1,ptr);
+			
+		}
+		else
+		{
+			cout<<"El codigo no esta siendo usado aun"<<endl;
+		}
+
+		fclose(ptr);
+	}
+}
+
+void ListarEmpresa()
+ {
+	Empresa reg;
+	FILE *ptr;
+
+	ptr = fopen("Bomba.dat","rb");
+
+	if(ptr == NULL)
+	{
+		cout<<"No se pudo abrir el archivo";
+	}
+	else
+	{
+		cout<<"                             **Listado de Empresa**                         "<<endl;
+		cout<<"============================================================================"<<endl;
+		cout<<"|id_empresa      -Nombre              -NIT        - id_region      - id_area|"<<endl;
+		cout<<"============================================================================"<<endl;
+		fread(&reg,sizeof(reg),1,ptr);
+		while(!feof(ptr))
+		{
+			if(!reg.eliminado)
+			{
+				MostrarEmpresa(reg);
+			}
+
+			fread(&reg,sizeof(reg),1,ptr);
+
+		}
+
+		fclose(ptr);
+	}
+}
+
+void MenuEmpresa()
+{
+	int id_empresa;
+    char Nombre[40];
+    char NIT[15];
+	int id_region;
+	int id_area;
+	Empresa reg;
+	bool eliminado = false;
+	int op = 0;
+	char aux[100];
+	do
+	{
+		cout<<endl<<"========================";
+		cout<<endl<<"        **Empresa**     ";
+		cout<<endl<<"========================";
+		cout<<endl<<"    |MENU DE OPCIONES|  ";
+		cout<<endl<<"1. Adicionar";
+		cout<<endl<<"2. Listar";
+		cout<<endl<<"3. Buscar";
+		cout<<endl<<"4. Eliminar";
+		cout<<endl<<"5. Modificar";
+		cout<<endl<<"6. Salir";
+		cout<<endl<< "Seleccione opcion: ";
+		cin>>op;
+		//cin.ignore();
+		gets(aux);
+		system("cls");
+		switch(op)
+		{
+		case 1:
+			{
+				do
+				{
+					id_empresa = -1;
+					cout<<"Ingresar id_empresa (escriba 0 para salir):";
+					cin>>id_empresa;
+					if(id_empresa != 0 && BuscarEmpresa(id_empresa, Nombre, NIT, id_region, id_area))
+					{
+						id_empresa = -1;
+						cout<<"Error, ya existe el id ingresado"<<endl;
+					}
+					gets(aux);
+					cin.clear();
+				}while(id_empresa == -1);
+				if((id_empresa!= 0)&&PedirDatosEmpresa(id_region,id_area,Nombre,NIT))
+				{
+					AdicionarEmpresa(id_empresa,Nombre,NIT,id_region,id_area);
+				}
+				break;
+			}
+		case 2:
+			{
+				ListarEmpresa();
+				break;
+			}
+		case 3:
+			{
+				do
+				{
+					id_empresa = -1;
+					cout<<"Ingresar id_empresa:";
+					cin>>id_empresa;
+					gets(aux);
+					cin.clear();
+				}while(id_empresa == -1 );
+				if(BuscarEmpresa(id_empresa,Nombre,NIT,id_region,id_area))
+				{
+					CamposAEmpresa(reg,id_empresa,Nombre,NIT,id_region,id_area,eliminado);
+
+					MostrarEmpresa(reg);
+				}
+				break;
+			}
+		case 4:
+			{
+				do
+				{
+					id_empresa = -1;
+					cout<<"Ingresar id_empresa:";
+					cin>>id_empresa;
+					gets(aux);
+					cin.clear();
+				}while(id_empresa == -1 );
+				EliminarEmpresa(id_empresa);
+				break;
+			}
+		case 5:
+			{
+				do
+				{
+					id_empresa = -1;
+					cout<<"Ingresar id_empresa (escriba 0 para salir):";
+					cin>>id_empresa;
+					gets(aux);
+					cin.clear();
+				}while(id_empresa == -1 || (id_empresa != 0 && !BuscarEmpresa(id_empresa, Nombre,NIT,id_region, id_area)));
+				if((id_empresa!= 0)&& PedirDatosEmpresa(id_region,id_area,Nombre,NIT))
+				{
+					ModificarEmpresa(id_empresa,Nombre,NIT,id_region,id_area);
+				}
+				break;
+			}
+		}
+	}while(op != 6);
+}
+
+
+
+void Menu_Principal()
+{ 
+	cout << "\n  --------------------------- ";
+	cout << "\n |       APLICACION STAZ      |";
+	cout << "\n  --------------------------- ";
+	cout << "\n  --------------------------- ";
+	cout << "\n |   Menu General Opciones   |";
+	cout << "\n  --------------------------- ";
+	cout << "\n | 1. Archivo Region       |";
+	cout << "\n | 2. Archivo Usuario          |";
+	cout << "\n | 3. Archivo Empresa       |";
+	cout << "\n | 4. Archivo Area        |";
+	cout << "\n | 0. Salir                  |";
+	cout << "\n  --------------------------- ";
+	cout << "\n  Elija Una Opcion: ";
+}
+int main()
+{
+	int OP=1;  
+	do
+	{
+		system("cls");
+		Menu_Principal();
+		cin >> OP;
+		cin.clear();
+		switch(OP)
+		{
+		case 1: MenuRegion(); 
+			    break;
+		case 2: MenuUsuario(); 
+			    break;
+		case 3: MenuEmpresa(); 
+			    break;
+		case 4: MenuArea(); 
+			    break;
+		case 0: cout<<endl<<"ADIOS";
+			    break;
+		default: cout<<"Opcion invalida...";
+
+        }
+	}while(OP!=0);
+}
